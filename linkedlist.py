@@ -6,6 +6,7 @@ class Node:
 class LinkedList:    
     def __init__(self):
         self.head = None
+        self.length = 0
 
     # Print Methods
     def printList(self):
@@ -19,73 +20,92 @@ class LinkedList:
             current = current.next
         print(" -> ".join(chart))
 
+    # TODO toList(self):
+
+    # TODO copyList(self):
+
+    def countOccurrences(self, value):
+        if not self.head:
+            return
+        current = self.head
+        count = 0
+        while current:
+            if current.data == value:
+                count += 1
+            current = current.next
+        return count
+
+    # TODO isPalindrome(self):
+
     # Insertion Methods
     def insertHead(self, data):
         dummy = Node(data)
         if not self.head:
             self.head = dummy
-            return
         else:
             dummy.next = self.head
             self.head = dummy
+        self.length += 1
 
     def insertTail(self, data):
         dummy = Node(data)
         if not self.head:
             self.head = dummy
-            return
-        current = self.head
-        while current.next: 
-            current = current.next
-        current.next = dummy
+        else:
+            current = self.head
+            while current.next: 
+                current = current.next
+            current.next = dummy
+        self.length += 1
 
     def insertIndex(self, data, index):
-        if index < 0 or index >self.getLength():
+        if index < 0 or index > self.length:
             print(f"Index {index} out of bounds.")
             return
         dummy = Node(data)
         current = self.head
         position = 0
-        try:
-            if position == index: 
-                self.insertHead(data)
-            else:
-                while current and position + 1 != index:
-                    position += 1
-                    current = current.next
+        
+        if position == index: 
+            self.insertHead(data)
+        else:
+            while current and position + 1 != index:
+                position += 1
+                current = current.next
                 
-                if current:
-                    dummy.next = current.next
-                    current.next = dummy
-        except Exception as e:
-            print(e)
+            if current:
+                dummy.next = current.next
+                current.next = dummy
+        self.length += 1
             
     def insertListHead(self, data):
-        for i in range(0, len(data)):
-            self.insertHead(data[i])
+        for item in data:
+            self.insertHead(item)
+            self.length += 1
             
     def insertListTail(self, data):
-        for i in range(0, len(data)):
-            self.insertTail(data[i])
+        for item in data:
+            self.insertTail(item)
+            self.length += 1
 
     # Removing Methods
     def removeHead(self):
         if not self.head:
             return
         self.head = self.head.next
+        self.length -= 1
 
     def removeTail(self):
         if not self.head:
             return
         if not self.head.next:
             self.head = None
-        current = self.head
-        while current.next.next: 
-            current = current.next
-        current.next = None
-
-    def clearList(self):
-        self.head = None
+        else:
+            current = self.head
+            while current.next.next: 
+                current = current.next
+            current.next = None
+        self.length -= 1
 
     def removeIndex(self, index):
         current = self.head
@@ -98,18 +118,21 @@ class LinkedList:
                 current = current.next
             if current: 
                 current.next = current.next.next
+        self.length -= 1
 
     def removeNode(self, data):
         if not self.head:
             return
         if self.head.data == data:
             self.removeHead()
+            self.length -= 1
             return
         current = self.head
         while current.next and current.next.data != data:
             current = current.next
         if current.next:
             current.next = current.next.next
+            self.length -= 1
 
     def removeDuplicates(self):
         current = self.head
@@ -117,9 +140,16 @@ class LinkedList:
         while current.next:
             if current.next.data in seen:
                 current.next = current.next.next
+                self.length -= 1
             else:
                 seen.add(current.next.data)
                 current = current.next
+
+    # TODO removeAll(self, value):
+
+    def clearList(self):
+        self.head = None
+        self.length = 0    
 
     # Changing Methods
     def updateNode(self, data, index):
@@ -145,17 +175,31 @@ class LinkedList:
             current = forward
         self.head = previous
 
+    # TODO splitList(self):
+
     # Sort Methods
     def bubbleSort(self):
+        if not self.head or not self.head.next:
+            return
         swapped = True
         while swapped:
             swapped = False
+            previous = None
             current = self.head
             while current and current.next:
                 if current.data > current.next.data:
-                    current.data, current.next.data = current.next.data, current.data
                     swapped = True
-                current = current.next
+                    temp = current.next
+                    current.next = temp.next
+                    temp.next = current
+                    if previous:
+                        previous.next = temp
+                    else:
+                        self.head = temp
+                    previous = temp
+                else:
+                    previous = current
+                    current = current.next
 
     def insertionSort(self):
         sorted_head = None
@@ -211,14 +255,8 @@ class LinkedList:
     # TODO quick sort
 
     # Searching Methods
-    def getLength(self):
-        length = 0
-        if self.head:
-            current = self.head
-            while current:
-                length += 1
-                current = current.next
-        return length
+
+    # TODO findMiddle(self):
 
     def getIndex(self, data):
         current = self.head
@@ -242,7 +280,9 @@ if __name__ == '__main__':
 
         myList.insertIndex(99, 2)
         myList.printList()
-        myList.mergeSort()
+        print(myList.countOccurrences(9))
+
+        myList.bubbleSort()
         myList.printList()
 
     except Exception as e:
